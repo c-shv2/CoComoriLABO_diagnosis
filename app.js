@@ -1,7 +1,7 @@
 const DATA = window.DIAGNOSIS_DATA;
 const MAJORS = ["amiable", "driving", "expressive", "analytical"];
 const MINORS = ["harmony", "performance", "expression", "observation"];
-const SHARE_URL = "";
+const SHARE_URL = "https://cocomori-labo-diagnosis.pages.dev/";
 function characterShortName(name) {
   return String(name || "").split("／")[0];
 }

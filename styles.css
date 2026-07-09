@@ -338,3 +338,60 @@ body.journey-result .result-after-note article {
     line-height: 1.95;
   }
 }
+
+/* Guardian library legibility boost */
+.page-guardians {
+  -webkit-font-smoothing: auto;
+  text-rendering: optimizeLegibility;
+}
+.guardian-card {
+  border-color: rgba(93, 74, 48, .24);
+  box-shadow: 0 10px 24px rgba(66, 55, 33, .06);
+}
+.guardian-card-body {
+  padding: 1rem 1.05rem 1.1rem;
+}
+.guardian-card-group {
+  color: #7a6333;
+  font-weight: 600;
+}
+.guardian-card-name {
+  color: #211d15;
+  font-weight: 600;
+}
+.guardian-card-catch {
+  color: #3f3828;
+  font-weight: 500;
+  font-size: .92rem;
+  line-height: 1.9;
+}
+.guardian-filter-btn {
+  color: #3f3828;
+  font-weight: 500;
+  border-color: rgba(93, 74, 48, .26);
+}
+.guardian-filter-btn.is-active {
+  color: #4f3d13;
+  font-weight: 600;
+}
+.page-guardians .btn-primary,
+.page-guardians .btn-subtle {
+  color: #3f3828;
+  background: rgba(255, 253, 248, .78);
+  border-color: rgba(93, 74, 48, .28);
+  font-weight: 600;
+  box-shadow: 0 8px 18px rgba(66, 55, 33, .08);
+}
+.page-guardians .btn-primary {
+  background: rgba(232, 208, 138, .36);
+  color: #4f3d13;
+}
+.page-guardians .btn-primary:hover,
+.page-guardians .btn-subtle:hover {
+  background: rgba(255, 253, 248, .96);
+  border-color: rgba(122, 97, 36, .46);
+}
+.guardian-lead {
+  color: #4f4937;
+  font-weight: 500;
+}
