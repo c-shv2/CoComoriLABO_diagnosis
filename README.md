@@ -73,8 +73,8 @@ CoComori LABOは、
 
 結果画面では、通常表示用の画像と保存・共有用の画像を分けています。
 
-- 画面表示: `result_driver_2.png`
-- 保存用: `result_driver_2_share.png`
+- 画面表示: `result_driving_harmony.png`
+- 保存用: `share_driving_harmony.png`
 
 ローカルの `file://` で開いている間は、PC内のパスがLINE/Xの共有文に入らないようにしています。GitHub Pagesなどで `https://...` の公開URLから開かれた場合だけ、共有文に診断URLが自動で追加されます。
 
