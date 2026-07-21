@@ -415,7 +415,7 @@ body.journey-result .result-after-note article {
 /* Post-diagnosis feedback invitation */
 .survey-invitation {
   max-width: 640px;
-  margin: 2rem auto 0;
+  margin: 2.4rem auto 0;
   padding: 1.35rem clamp(1rem, 4vw, 1.6rem);
   border: 1px solid rgba(122, 97, 36, .22);
   border-radius: 18px;
@@ -423,21 +423,23 @@ body.journey-result .result-after-note article {
 }
 .survey-eyebrow {
   margin-bottom: .45rem;
-  color: #9a7b26;
-  font-size: .68rem;
+  color: #80651f;
+  font-size: .72rem;
+  font-weight: 600;
   letter-spacing: .14em;
 }
 .survey-invitation h3 {
   margin: 0 0 .55rem;
   color: #4a442e;
   font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
-  font-size: 1.08rem;
-  font-weight: 400;
+  font-size: 1.12rem;
+  font-weight: 600;
 }
 .survey-invitation p {
   margin: 0 auto 1rem;
-  color: #6b634f;
-  font-size: .84rem;
+  color: #514b3d;
+  font-size: .9rem;
+  font-weight: 500;
   line-height: 1.85;
 }
 .btn-survey {
@@ -451,14 +453,16 @@ body.journey-result .result-after-note article {
   border-radius: 999px;
   background: #7b6939;
   color: #fffdf8;
-  font-size: .9rem;
+  font-size: .94rem;
+  font-weight: 600;
   text-decoration: none;
   transition: border-color .18s ease, background .18s ease, transform .18s ease;
 }
 .btn-survey span {
   margin-top: .15rem;
-  color: rgba(255, 253, 248, .75);
-  font-size: .62rem;
+  color: rgba(255, 253, 248, .9);
+  font-size: .68rem;
+  font-weight: 500;
   letter-spacing: .04em;
 }
 .btn-survey:hover {
@@ -468,4 +472,20 @@ body.journey-result .result-after-note article {
 }
 @media (max-width: 560px) {
   .btn-survey { width: 100%; }
+}
+
+/* Improve legibility of small text on the result page */
+body.journey-result .share-label {
+  color: #526544;
+  font-size: .8rem;
+  font-weight: 600;
+}
+body.journey-result .btn-share,
+body.journey-result .btn-retry,
+body.journey-result .btn-discovery {
+  color: #494331;
+  font-weight: 500;
+}
+body.journey-result .btn-discovery span {
+  font-weight: 500;
 }
