@@ -411,3 +411,61 @@ body.journey-result .result-after-note article {
   color: #4f4937;
   font-weight: 500;
 }
+
+/* Post-diagnosis feedback invitation */
+.survey-invitation {
+  max-width: 640px;
+  margin: 2rem auto 0;
+  padding: 1.35rem clamp(1rem, 4vw, 1.6rem);
+  border: 1px solid rgba(122, 97, 36, .22);
+  border-radius: 18px;
+  background: rgba(255, 253, 248, .58);
+}
+.survey-eyebrow {
+  margin-bottom: .45rem;
+  color: #9a7b26;
+  font-size: .68rem;
+  letter-spacing: .14em;
+}
+.survey-invitation h3 {
+  margin: 0 0 .55rem;
+  color: #4a442e;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 1.08rem;
+  font-weight: 400;
+}
+.survey-invitation p {
+  margin: 0 auto 1rem;
+  color: #6b634f;
+  font-size: .84rem;
+  line-height: 1.85;
+}
+.btn-survey {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: .6rem 1.5rem;
+  border: 1px solid #7b6939;
+  border-radius: 999px;
+  background: #7b6939;
+  color: #fffdf8;
+  font-size: .9rem;
+  text-decoration: none;
+  transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+.btn-survey span {
+  margin-top: .15rem;
+  color: rgba(255, 253, 248, .75);
+  font-size: .62rem;
+  letter-spacing: .04em;
+}
+.btn-survey:hover {
+  transform: translateY(-2px);
+  border-color: #67572e;
+  background: #67572e;
+}
+@media (max-width: 560px) {
+  .btn-survey { width: 100%; }
+}
