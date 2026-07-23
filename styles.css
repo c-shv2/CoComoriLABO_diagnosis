@@ -489,3 +489,89 @@ body.journey-result .btn-discovery {
 body.journey-result .btn-discovery span {
   font-weight: 500;
 }
+
+/* LINE journey after reading the diagnosis */
+.line-invitation {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.2rem;
+  align-items: center;
+  max-width: 720px;
+  margin: 2rem auto 0;
+  padding: clamp(1.25rem, 4vw, 1.8rem);
+  border: 1px solid rgba(90, 113, 62, .28);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 253, 248, .86), rgba(232, 239, 218, .72));
+  text-align: left;
+  box-shadow: 0 14px 32px rgba(66, 55, 33, .07);
+}
+.line-invitation-mark {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #e4ecd5;
+  color: #50643d;
+  font-size: 1.45rem;
+}
+.line-eyebrow {
+  margin-bottom: .35rem;
+  color: #5d7245;
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+}
+.line-invitation h3 {
+  margin: 0 0 .55rem;
+  color: #343d2b;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(1.08rem, 3vw, 1.3rem);
+  font-weight: 600;
+  line-height: 1.65;
+}
+.line-invitation p {
+  margin: 0 0 1rem;
+  color: #4f5746;
+  font-size: .92rem;
+  font-weight: 500;
+  line-height: 1.9;
+}
+.btn-line-journey {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: .65rem 1.5rem;
+  border: 1px solid #3f6a3c;
+  border-radius: 999px;
+  background: #3f6a3c;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.btn-line-journey strong {
+  font-size: .95rem;
+  font-weight: 600;
+}
+.btn-line-journey span {
+  margin-top: .12rem;
+  color: rgba(255, 255, 255, .86);
+  font-size: .7rem;
+  font-weight: 500;
+}
+.btn-line-journey:hover {
+  transform: translateY(-2px);
+  border-color: #31572f;
+  background: #31572f;
+}
+@media (max-width: 560px) {
+  .line-invitation {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .line-invitation-mark { margin: 0 auto; }
+  .btn-line-journey { width: 100%; }
+}
