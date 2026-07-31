@@ -1,4 +1,32 @@
 const DATA = window.DIAGNOSIS_DATA;
+const STAGE2_REVISIONS = {
+  amiable: {
+    2: { room: "③談話室", theme: "集団での立ち位置", question: "洋館の談話室に入ると、何人かのゴーストがそれぞれ自由に過ごしています。初めて会うゴーストばかりです。あなたはまず、どう過ごそうと思う？", labels: { harmony: "誰かひとりでいるゴーストがいたら、そばに行ってみようかな", performance: "何か手伝えることがないか見てみよう", expression: "話しやすそうなゴーストに声をかけてみたい", observation: "まずは少し離れたところから、みんなの様子を見ていよう" } },
+    6: { room: "⑦舞踏会", theme: "社会で使う自分", question: "今夜、洋館では小さな舞踏会が開かれます。たくさんのゴーストが集まる中、あなたはどんなふうに振る舞っていると一番安心できそう？", labels: { harmony: "相手が安心できるように、やわらかく接していたい", performance: "頼られたときに、ちゃんと応えられる自分でいたい", expression: "明るく親しみやすく、楽しい雰囲気でいたい", observation: "無理に目立たず、相手の様子を見ながら過ごしたい" } }
+  },
+  driving: {
+    2: { room: "③談話室", theme: "集団での立ち位置", question: "洋館の談話室に入ると、何人かのゴーストがそれぞれ自由に過ごしています。初めて会うゴーストばかりです。あなたはまず、どう過ごそうと思う？", labels: { harmony: "みんなが過ごしやすそうか、少し気にしておこう", performance: "必要なら、自分から声をかけて場を動かそう", expression: "せっかくだし、楽しい雰囲気を作ってみたい", observation: "まず誰がどんなふうに過ごしているのか把握しよう" } },
+    6: { room: "⑦舞踏会", theme: "社会で使う自分", question: "今夜、洋館では小さな舞踏会が開かれます。たくさんのゴーストが集まる中、あなたはどんなふうに振る舞っていると一番安心できそう？", labels: { harmony: "みんなが居心地よく過ごせるように気を配りたい", performance: "必要なら自分が場をまとめる側でいたい", expression: "堂々と振る舞って、場に存在感を出したい", observation: "感情に流されず、冷静に状況を見ていたい" } }
+  },
+  expressive: {
+    2: { room: "③談話室", theme: "集団での立ち位置", question: "洋館の談話室に入ると、何人かのゴーストがそれぞれ自由に過ごしています。初めて会うゴーストばかりです。あなたはまず、どう過ごそうと思う？", labels: { harmony: "誰かと自然に仲良くなれたらいいな", performance: "自分から話題を出して、輪に入ってみよう", expression: "なんだか気になるゴーストのところへ行ってみたい", observation: "どんなゴーストたちなのか、少し眺めていたい" } },
+    6: { room: "⑦舞踏会", theme: "社会で使う自分", question: "今夜、洋館では小さな舞踏会が開かれます。たくさんのゴーストが集まる中、あなたはどんなふうに振る舞っていると一番安心できそう？", labels: { harmony: "周りの人が楽しくいられるように振る舞いたい", performance: "自分から声をかけて、場を動かしてみたい", expression: "自分らしさを隠さず、自由に振る舞いたい", observation: "無理に輪に入らず、気になる人や場を眺めていたい" } }
+  },
+  analytical: {
+    2: { room: "③談話室", theme: "集団での立ち位置", question: "洋館の談話室に入ると、何人かのゴーストがそれぞれ自由に過ごしています。初めて会うゴーストばかりです。あなたはまず、どう過ごそうと思う？", labels: { harmony: "邪魔にならないところで、話しかけられたら応じよう", performance: "何か必要なことがありそうなら、自分から動こう", expression: "面白そうな話をしているところがあれば混ざってみたい", observation: "まずこの場所の雰囲気や、みんなの距離感を見ておこう" } },
+    6: { room: "⑦舞踏会", theme: "社会で使う自分", question: "今夜、洋館では小さな舞踏会が開かれます。たくさんのゴーストが集まる中、あなたはどんなふうに振る舞っていると一番安心できそう？", labels: { harmony: "話しかけられたら、安心して話せる相手でいたい", performance: "役割が必要なら、きちんと引き受けたい", expression: "自分なりの考えや個性は自然に出していたい", observation: "必要以上に自分を見せず、静かに様子を見ていたい" } }
+  }
+};
+Object.keys(STAGE2_REVISIONS).forEach(function(major) {
+  Object.keys(STAGE2_REVISIONS[major]).forEach(function(index) {
+    var revision = STAGE2_REVISIONS[major][index];
+    var question = DATA.stage2ByMajor[major][Number(index)];
+    question.room = revision.room;
+    question.theme = revision.theme;
+    question.question = revision.question;
+    question.options.forEach(function(option) { option.label = revision.labels[option.key]; });
+  });
+});
 const MAJORS = ["amiable", "driving", "expressive", "analytical"];
 const MINORS = ["harmony", "performance", "expression", "observation"];
 const SHARE_URL = "https://cocomori-labo-diagnosis.pages.dev/";
