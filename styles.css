@@ -537,6 +537,11 @@ body.journey-result .btn-discovery span {
   font-weight: 500;
   line-height: 1.9;
 }
+.line-guardian-name {
+  color: #3f5f36;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-weight: 700;
+}
 .btn-line-journey {
   display: inline-flex;
   flex-direction: column;
