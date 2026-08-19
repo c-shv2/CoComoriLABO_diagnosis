@@ -580,3 +580,95 @@ body.journey-result .btn-discovery span {
   .line-invitation-mark { margin: 0 auto; }
   .btn-line-journey { width: 100%; }
 }
+
+/* A glimpse of the guardian between stage 1 and stage 2 */
+.page-threshold {
+  overflow: hidden;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(200, 168, 75, .13), transparent 28%),
+    linear-gradient(160deg, #101f12 0%, #182819 58%, #101a11 100%);
+}
+.threshold-wrap { width: min(100%, 620px); }
+.threshold-eyebrow {
+  margin-bottom: 1.1rem;
+  color: var(--sunbeam);
+  font-size: .66rem;
+  letter-spacing: .3em;
+  opacity: .78;
+}
+.guardian-presence {
+  position: relative;
+  width: 180px;
+  height: 190px;
+  margin: 0 auto .75rem;
+}
+.guardian-glow {
+  position: absolute;
+  inset: 12px 0 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 208, 138, .25), rgba(200, 168, 75, .06) 42%, transparent 70%);
+  animation: presencePulse 3.4s ease-in-out infinite;
+}
+.guardian-silhouette {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  width: 62px;
+  height: 105px;
+  border-radius: 48% 48% 38% 38%;
+  background: linear-gradient(to bottom, rgba(7, 17, 9, .72), rgba(7, 17, 9, .96));
+  filter: blur(.3px);
+  transform: translateX(-50%);
+  animation: presenceFloat 4.2s ease-in-out infinite;
+}
+.guardian-silhouette:before,
+.guardian-silhouette:after {
+  content: "";
+  position: absolute;
+  top: -13px;
+  width: 28px;
+  height: 38px;
+  background: rgba(7, 17, 9, .9);
+}
+.guardian-silhouette:before { left: 1px; border-radius: 90% 10% 45% 55%; transform: rotate(-24deg); }
+.guardian-silhouette:after { right: 1px; border-radius: 10% 90% 55% 45%; transform: rotate(24deg); }
+.guardian-silhouette i {
+  position: absolute;
+  left: 50%;
+  top: 33px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--sunbeam-soft);
+  box-shadow: 16px 0 0 var(--sunbeam-soft), 0 0 9px rgba(232, 208, 138, .8), 16px 0 9px rgba(232, 208, 138, .8);
+  transform: translateX(-10px);
+  opacity: .75;
+}
+.guardian-trail {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--sunbeam-soft);
+  box-shadow: 0 0 8px rgba(232, 208, 138, .8);
+  animation: trailDrift 3s ease-in-out infinite;
+}
+.guardian-trail-one { left: 25px; top: 94px; }
+.guardian-trail-two { right: 30px; top: 65px; animation-delay: -1s; }
+.guardian-trail-three { right: 18px; bottom: 42px; animation-delay: -2s; }
+.threshold-whisper { margin: 0 0 .75rem; color: var(--leaf-pale); font-size: .8rem; letter-spacing: .08em; }
+.threshold-title { margin: 0 0 1rem; color: var(--white-soft); font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: clamp(1.3rem, 4vw, 1.85rem); font-weight: 300; line-height: 1.85; }
+.threshold-copy { margin: 0 0 1.7rem; color: var(--mist-fade); font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: .92rem; line-height: 2; }
+.threshold-actions { display: flex; flex-direction: column; align-items: center; gap: .75rem; }
+.threshold-actions .btn-subtle { border-color: transparent; }
+@keyframes presencePulse { 0%, 100% { opacity: .6; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes presenceFloat { 0%, 100% { transform: translate(-50%, 2px); } 50% { transform: translate(-50%, -4px); } }
+@keyframes trailDrift { 0%, 100% { opacity: .15; transform: translateY(8px); } 50% { opacity: .85; transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) {
+  .guardian-glow, .guardian-silhouette, .guardian-trail { animation: none; }
+}
+@media (max-width: 560px) {
+  .guardian-presence { width: 150px; height: 160px; }
+  .threshold-actions .btn-primary { width: min(100%, 320px); }
+}
