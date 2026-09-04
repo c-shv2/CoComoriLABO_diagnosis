@@ -1,0 +1,1 @@
+{"kind":"region","sheet":"匿名回答","address":"A1:AL1","rows":1,"cols":38,"nonEmpty":38,"text":38,"maxTextLength":8,"preview":[["受信日時","送信ID","診断バージョン","前半Q1","前半Q2","前半Q3"]],"previewAddress":"A1:F1","previewRows":1,"previewCols":6}

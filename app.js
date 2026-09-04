@@ -46,6 +46,8 @@ const MINOR_TIEBREAKERS = {
   analytical: { question: "洋館の書斎で、同じ場所を描いた二枚の地図を見つけました。しかし、描かれている道が少しずつ違います。あなたが最初にしたいと思うのは？", options: { harmony: "みんなが迷わないよう、分かったことを共有しながら確かめたい。", performance: "二枚の違いを整理して、使える地図にまとめたい。", expression: "どちらにもない、新しい道の可能性を考えてみたい。", observation: "細部を見比べて、なぜ違いが生まれたのか突き止めたい。" } }
 };
 const SHARE_URL = "https://cocomori-labo-diagnosis.pages.dev/";
+const RESPONSE_ENDPOINT = "https://script.google.com/macros/s/AKfycbw5clTA3quYP8kf4ATSyyrN270I8rWE5IFuEkiJPLggWdT60sEfsKJj5P-3XVQRuWAb1w/exec";
+const DIAGNOSIS_VERSION = "2026-09-04";
 function characterShortName(name) {
   return String(name || "").split("／")[0];
 }
@@ -70,7 +72,7 @@ const ATTRIBUTE = {
   expressive: { label: "Expressive", jp: "エクスプレッシブ", color: "#e3a849" },
   analytical: { label: "Analytical", jp: "アナリティカル", color: "#5b8fbd" }
 };
-const state = { page: "title", stage: 1, index: 0, majorScores: {}, minorScores: {}, major: null, result: null, filter: "all", history: [], optionOrders: {}, tieBreak: null, tieResolutions: {} };
+const state = { page: "title", stage: 1, index: 0, majorScores: {}, minorScores: {}, major: null, result: null, filter: "all", history: [], optionOrders: {}, tieBreak: null, tieResolutions: {}, answers: { stage1: [], stage2: [] }, submissionId: null, responseSubmitted: false };
 const $ = function(selector) { return document.querySelector(selector); };
 function esc(value) { return String(value == null ? "" : value).replace(/[&<>\"]/g, function(c) { return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
 function setAccent(major) { document.documentElement.style.setProperty("--accent", (ATTRIBUTE[major] || ATTRIBUTE.amiable).color); }
@@ -92,8 +94,10 @@ function createKomorebi() {
   for (var j = 0; j < 30; j++) { var dot = document.createElement("span"); dot.className = "komorebi-dot"; var size = 2 + Math.random() * 5; dot.style.width = size + "px"; dot.style.height = size + "px"; dot.style.left = Math.random() * 100 + "%"; dot.style.top = Math.random() * 100 + "%"; dot.style.animationDuration = 5 + Math.random() * 8 + "s"; dot.style.animationDelay = Math.random() * 6 + "s"; layer.appendChild(dot); }
 }
 function transitionTo(page) { var leaf = $("#leafTransition"); if (!leaf) { state.page = page; render(); return; } leaf.classList.add("show"); window.setTimeout(function() { state.page = page; render(); leaf.classList.remove("show"); }, 240); }
-function startJourney() { state.stage = 1; state.index = 0; state.majorScores = {}; state.minorScores = {}; state.major = null; state.result = null; state.history = []; state.optionOrders = {}; state.tieBreak = null; state.tieResolutions = {}; transitionTo("question"); }
-function resetJourney() { state.stage = 1; state.index = 0; state.majorScores = {}; state.minorScores = {}; state.major = null; state.result = null; state.history = []; state.optionOrders = {}; state.tieBreak = null; state.tieResolutions = {}; transitionTo("title"); }
+function newSubmissionId() { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + "-" + Math.random().toString(36).slice(2); }
+function clearJourneyState() { state.stage = 1; state.index = 0; state.majorScores = {}; state.minorScores = {}; state.major = null; state.result = null; state.history = []; state.optionOrders = {}; state.tieBreak = null; state.tieResolutions = {}; state.answers = { stage1: [], stage2: [] }; state.submissionId = newSubmissionId(); state.responseSubmitted = false; }
+function startJourney() { clearJourneyState(); transitionTo("question"); }
+function resetJourney() { clearJourneyState(); transitionTo("title"); }
 function currentQuestion() { return state.stage === 1 ? DATA.stage1[state.index] : DATA.stage2ByMajor[state.major][state.index]; }
 function shuffleOptions(options, key) {
   if (!state.optionOrders[key]) {
@@ -108,24 +112,30 @@ function shuffleOptions(options, key) {
 }
 function winner(scores, order) { return order.reduce(function(best, key) { return !best || (scores[key] || 0) > (scores[best] || 0) ? key : best; }, null); }
 function topCandidates(scores, order) { var max = Math.max.apply(null, order.map(function(key) { return scores[key] || 0; })); return order.filter(function(key) { return (scores[key] || 0) === max; }); }
-function snapshot() { return { stage: state.stage, index: state.index, majorScores: Object.assign({}, state.majorScores), minorScores: Object.assign({}, state.minorScores), major: state.major, result: state.result, optionOrders: JSON.parse(JSON.stringify(state.optionOrders)), tieBreak: state.tieBreak ? JSON.parse(JSON.stringify(state.tieBreak)) : null, tieResolutions: Object.assign({}, state.tieResolutions) }; }
+function snapshot() { return { stage: state.stage, index: state.index, majorScores: Object.assign({}, state.majorScores), minorScores: Object.assign({}, state.minorScores), major: state.major, result: state.result, optionOrders: JSON.parse(JSON.stringify(state.optionOrders)), tieBreak: state.tieBreak ? JSON.parse(JSON.stringify(state.tieBreak)) : null, tieResolutions: JSON.parse(JSON.stringify(state.tieResolutions)), answers: JSON.parse(JSON.stringify(state.answers)), submissionId: state.submissionId, responseSubmitted: state.responseSubmitted }; }
+function finalizeResult(minor) {
+  state.result = DATA.types.find(function(type) { return type.major === state.major && type.minor === minor; });
+  saveDiagnosisResponse();
+  transitionTo("result");
+}
 function choose(key) {
   state.history.push(snapshot());
   if (state.stage === 1) {
+    state.answers.stage1[state.index] = key;
     state.majorScores[key] = (state.majorScores[key] || 0) + 1;
     if (state.index < DATA.stage1.length - 1) { state.index += 1; render(); return; }
     var majorCandidates = topCandidates(state.majorScores, MAJORS);
     if (majorCandidates.length > 1) { state.tieBreak = { phase: "major", candidates: majorCandidates }; transitionTo("tiebreak"); return; }
     state.major = majorCandidates[0]; state.stage = 2; state.index = 0; setAccent(state.major); transitionTo("threshold"); return;
   }
+  state.answers.stage2[state.index] = key;
   state.minorScores[key] = (state.minorScores[key] || 0) + 1;
   var stage2 = DATA.stage2ByMajor[state.major];
   if (state.index < stage2.length - 1) { state.index += 1; render(); return; }
   var minorCandidates = topCandidates(state.minorScores, MINORS);
   if (minorCandidates.length > 1) { state.tieBreak = { phase: "minor", candidates: minorCandidates }; transitionTo("tiebreak"); return; }
   var minor = minorCandidates[0];
-  state.result = DATA.types.find(function(type) { return type.major === state.major && type.minor === minor; });
-  transitionTo("result");
+  finalizeResult(minor);
 }
 function resolveTie(key) {
   if (!state.tieBreak || state.tieBreak.candidates.indexOf(key) < 0) return;
@@ -133,8 +143,36 @@ function resolveTie(key) {
   state.tieResolutions[phase] = { candidates: state.tieBreak.candidates.slice(), selected: key };
   state.tieBreak = null;
   if (phase === "major") { state.major = key; state.stage = 2; state.index = 0; setAccent(key); transitionTo("threshold"); return; }
-  state.result = DATA.types.find(function(type) { return type.major === state.major && type.minor === key; });
-  transitionTo("result");
+  finalizeResult(key);
+}
+function responsePayload() {
+  var majorTie = state.tieResolutions.major || {};
+  var minorTie = state.tieResolutions.minor || {};
+  return {
+    submissionId: state.submissionId,
+    version: DIAGNOSIS_VERSION,
+    stage1Answers: state.answers.stage1.slice(0, 10),
+    majorScores: MAJORS.map(function(key) { return state.majorScores[key] || 0; }),
+    majorTieCandidates: majorTie.candidates || [],
+    majorTieAnswer: majorTie.selected || "",
+    major: state.major,
+    stage2Answers: state.answers.stage2.slice(0, 10),
+    minorScores: MINORS.map(function(key) { return state.minorScores[key] || 0; }),
+    minorTieCandidates: minorTie.candidates || [],
+    minorTieAnswer: minorTie.selected || "",
+    resultId: state.result ? state.result.id : "",
+    resultName: state.result ? splitName(state.result.name).main : ""
+  };
+}
+function saveDiagnosisResponse() {
+  if (!RESPONSE_ENDPOINT || state.responseSubmitted || !state.result) return;
+  state.responseSubmitted = true;
+  var body = JSON.stringify(responsePayload());
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(RESPONSE_ENDPOINT, new Blob([body], { type: "text/plain;charset=UTF-8" }));
+    return;
+  }
+  fetch(RESPONSE_ENDPOINT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: body, keepalive: true }).catch(function() {});
 }
 function goBack() { var prev = state.history.pop(); if (!prev) return; var fromInterlude = state.page === "threshold" || state.page === "tiebreak"; Object.assign(state, prev); if (fromInterlude) state.page = "question"; render(); }
 function stripMarkdown(text) { return String(text || "").replace(/^#{2,3}\s*/gm, "").replace(/\*\*(.*?)\*\*/g, "$1").replace(/^>\s*/gm, "").replace(/^-\s*/gm, "・").trim(); }
@@ -207,7 +245,7 @@ function downloadImage() {
 }
 function toast(message) { var old = $(".toast"); if (old) old.remove(); var el = document.createElement("div"); el.className = "toast"; el.textContent = message; document.body.appendChild(el); requestAnimationFrame(function(){ el.classList.add("show"); }); window.setTimeout(function(){ el.remove(); }, 1800); }
 function titleView() { return '<section class="page active page-title"><div class="title-card"><div class="title-eyebrow">CoComori LABO</div><h1 class="title-main"><span class="title-nowrap">こころの<em>守護者</em>に出逢う旅</span></h1><p class="title-sub">あなたを守ってきた子に出会う16タイプ性格診断</p><p class="title-cta-lead">あなたを守り続けてきた子に、会いにいこう</p><div class="title-actions"><button class="btn-primary" data-action="intro">診断をはじめる</button><button class="btn-library-entry" data-action="library"><strong>16人の守護者図鑑を見る</strong><span>旅の前に、森にいる子たちをのぞく</span></button></div></div></section>'; }
-function introView() { return '<section class="page active page-intro"><div class="intro-container"><div class="intro-eyebrow">Before the Journey</div><h2 class="intro-title">旅の前に</h2><p class="intro-lead">この診断は、あなたの性格を決めつけるものではありません。これまであなたを守ってきた反応を、16人の守護者との出会いとして受け取るための小さな旅です。</p><div class="intro-stats"><div class="intro-stat"><strong>約5〜8分</strong><span>所要時間</span></div><div class="intro-stat"><strong>20問</strong><span>質問数</span></div><div class="intro-stat"><strong>16タイプ</strong><span>結果</span></div></div><div class="intro-notes"><div class="intro-note"><strong>正解・不正解はありません。</strong><br>今の自分に近いものを、直感で選んでください。</div><div class="intro-note"><strong>迷ったら、少しだけ近い方で大丈夫。</strong><br>診断結果は分類ではなく、あなたを守ってきた子に会うための入口です。</div><div class="intro-note"><strong>結果は持ち帰れます。</strong><br>画像保存、LINE、Xでの共有ができます。</div></div><div class="intro-actions"><button class="btn-primary" data-action="start">旅を始める</button></div></div></section>'; }
+function introView() { return '<section class="page active page-intro"><div class="intro-container"><div class="intro-eyebrow">Before the Journey</div><h2 class="intro-title">旅の前に</h2><p class="intro-lead">この診断は、あなたの性格を決めつけるものではありません。これまであなたを守ってきた反応を、16人の守護者との出会いとして受け取るための小さな旅です。</p><div class="intro-stats"><div class="intro-stat"><strong>約5〜8分</strong><span>所要時間</span></div><div class="intro-stat"><strong>20問</strong><span>質問数</span></div><div class="intro-stat"><strong>16タイプ</strong><span>結果</span></div></div><div class="intro-notes"><div class="intro-note"><strong>正解・不正解はありません。</strong><br>今の自分に近いものを、直感で選んでください。</div><div class="intro-note"><strong>迷ったら、少しだけ近い方で大丈夫。</strong><br>診断結果は分類ではなく、あなたを守ってきた子に会うための入口です。</div><div class="intro-note"><strong>結果は持ち帰れます。</strong><br>画像保存、LINE、Xでの共有ができます。</div><div class="intro-note"><strong>回答は匿名で記録されます。</strong><br>診断の改善に使い、氏名・連絡先など個人を特定する情報は収集しません。</div></div><div class="intro-actions"><button class="btn-primary" data-action="start">旅を始める</button></div></div></section>'; }
 function questionView() {
   var q = currentQuestion();
   var step = state.stage === 1 ? state.index + 1 : 10 + state.index + 1;
