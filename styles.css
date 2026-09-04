@@ -413,6 +413,50 @@ body.journey-result .result-after-note article {
 }
 
 /* Post-diagnosis feedback invitation */
+.result-reason {
+  margin: 2.2rem auto;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border-radius: 24px;
+  background: rgba(255, 253, 248, .68);
+  color: #403d2f;
+  text-align: left;
+  box-shadow: 0 14px 36px rgba(66, 55, 33, .08);
+}
+.result-reason-eyebrow { margin-bottom: .45rem; color: #60734b; font-size: .74rem; font-weight: 600; letter-spacing: .14em; }
+.result-reason h3 { margin: 0 0 .4rem; color: #403d2f; font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: clamp(1.18rem, 3vw, 1.5rem); font-weight: 600; }
+.result-reason-lead { margin: 0 0 1.5rem; color: #696453; font-size: .9rem; font-weight: 500; line-height: 1.8; }
+.result-reason-path { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(150px, .72fr); align-items: center; gap: 1rem; }
+.result-score-stage header { display: flex; justify-content: space-between; gap: .7rem; align-items: baseline; margin-bottom: .7rem; }
+.result-score-stage header strong { color: #494331; font-size: .88rem; font-weight: 600; }
+.result-score-stage header span { color: #77705d; font-size: .7rem; font-weight: 500; }
+.result-score-row { display: grid; grid-template-columns: 5.6rem minmax(50px, 1fr) 2.4rem; gap: .45rem; align-items: center; margin: .62rem 0; color: #575143; font-size: .76rem; font-weight: 500; }
+.result-score-track { height: 8px; overflow: hidden; border-radius: 999px; background: rgba(78, 91, 62, .12); }
+.result-score-track i { display: block; height: 100%; border-radius: inherit; background: #657d50; }
+.result-score-row.is-near .result-score-track i { background: #b6903c; }
+.result-score-row.is-muted .result-score-track i { background: #aaa997; }
+.result-score-row strong { color: #403d2f; font-size: .8rem; font-weight: 600; text-align: right; }
+.result-score-row small { color: #817a68; font-size: .62rem; font-weight: 500; }
+.result-reason-symbol { color: #8d7b4e; font-family: "Yu Mincho", serif; font-size: 1.4rem; text-align: center; }
+.result-reason-guardian { padding: 1.2rem .85rem; border-radius: 18px; background: rgba(228, 236, 213, .72); text-align: center; }
+.result-reason-guardian span { display: block; margin-bottom: .45rem; color: #68715d; font-size: .68rem; font-weight: 500; line-height: 1.55; }
+.result-reason-guardian strong { color: #425238; font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: 1.05rem; font-weight: 600; }
+.result-reason-copy { margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px solid rgba(89, 75, 42, .16); }
+.result-reason-copy > strong { color: #494331; font-weight: 600; }
+.result-reason-copy p { margin: .45rem 0 0; color: #575143; font-size: .88rem; font-weight: 500; line-height: 1.85; }
+.result-near-guardian { display: flex; gap: .55rem; align-items: center; margin-top: .8rem; color: #58664a; font-size: .84rem; font-weight: 500; line-height: 1.7; }
+.result-near-guardian i { width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; background: #b6903c; }
+.result-near-guardian strong { font-weight: 600; }
+.result-reason-note { margin: 1rem 0 0; color: #736d5d; font-size: .72rem; font-weight: 500; line-height: 1.7; }
+@media (max-width: 760px) {
+  .result-reason-path { grid-template-columns: 1fr; }
+  .result-reason-symbol { transform: rotate(90deg); }
+  .result-reason-guardian { max-width: 260px; width: 100%; margin: 0 auto; }
+}
+@media (max-width: 420px) {
+  .result-score-row { grid-template-columns: 5rem minmax(40px, 1fr) 2.2rem; gap: .35rem; font-size: .72rem; }
+}
+
+/* Post-diagnosis feedback invitation */
 .survey-invitation {
   max-width: 640px;
   margin: 2.4rem auto 0;
