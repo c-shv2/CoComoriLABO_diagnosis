@@ -29,6 +29,22 @@ Object.keys(STAGE2_REVISIONS).forEach(function(major) {
 });
 const MAJORS = ["amiable", "driving", "expressive", "analytical"];
 const MINORS = ["harmony", "performance", "expression", "observation"];
+const MAJOR_TIEBREAKER = {
+  theme: "ふたつの気配のあいだで",
+  question: "洋館で開かれる予定だった催しが、直前になって中止になりました。集まったゴーストたちは、これからどうしようかと戸惑っています。あなたが最初に気になるのは？",
+  options: {
+    amiable: "みんな、がっかりしたり居心地が悪くなったりしていないかな。",
+    driving: "このあとの過ごし方を、早めに決めた方がよさそう。",
+    expressive: "せっかく集まったんだから、別の楽しいことができないかな。",
+    analytical: "どうして中止になったのか、まず状況を確認したい。"
+  }
+};
+const MINOR_TIEBREAKERS = {
+  amiable: { question: "談話室では、何人かのゴーストが楽しそうに話しています。少し離れたところに、輪に入れずにいるゴーストが一人います。あなたが最初にしたいと思うのは？", options: { harmony: "まずそばに行って、安心していられるようにしたい。", performance: "その子が輪に入りやすくなるよう、できることを探したい。", expression: "明るく声をかけて、自然に会話へ招き入れたい。", observation: "その子が本当に輪に入りたいのか、少し様子を見たい。" } },
+  driving: { question: "ゴーストたちと森を進んでいると、大きな倒木が道を塞いでいました。みんなが足を止める中、あなたが最初にしようと思うのは？", options: { harmony: "みんなの意見を聞いて、納得できる進み方を決めたい。", performance: "自分が先頭に立って、道を開く方法を試したい。", expression: "別の面白い進み方を提案して、みんなの気持ちを上げたい。", observation: "倒木や周囲を調べて、一番安全で確実な道を見つけたい。" } },
+  expressive: { question: "舞踏会の会場に、まだ何も用意されていない小さな舞台があります。「自由に使っていいよ」と言われたとき、最初に心が向くのは？", options: { harmony: "みんなが一緒に楽しめる時間にしたい。", performance: "自分が何かを披露して、舞台を盛り上げたい。", expression: "今ここでしかできない、自分らしいものを表現したい。", observation: "会場の雰囲気を眺めながら、どんな舞台が合うか考えたい。" } },
+  analytical: { question: "洋館の書斎で、同じ場所を描いた二枚の地図を見つけました。しかし、描かれている道が少しずつ違います。あなたが最初にしたいと思うのは？", options: { harmony: "みんなが迷わないよう、分かったことを共有しながら確かめたい。", performance: "二枚の違いを整理して、使える地図にまとめたい。", expression: "どちらにもない、新しい道の可能性を考えてみたい。", observation: "細部を見比べて、なぜ違いが生まれたのか突き止めたい。" } }
+};
 const SHARE_URL = "https://cocomori-labo-diagnosis.pages.dev/";
 function characterShortName(name) {
   return String(name || "").split("／")[0];
@@ -54,7 +70,7 @@ const ATTRIBUTE = {
   expressive: { label: "Expressive", jp: "エクスプレッシブ", color: "#e3a849" },
   analytical: { label: "Analytical", jp: "アナリティカル", color: "#5b8fbd" }
 };
-const state = { page: "title", stage: 1, index: 0, majorScores: {}, minorScores: {}, major: null, result: null, filter: "all", history: [], optionOrders: {} };
+const state = { page: "title", stage: 1, index: 0, majorScores: {}, minorScores: {}, major: null, result: null, filter: "all", history: [], optionOrders: {}, tieBreak: null, tieResolutions: {} };
 const $ = function(selector) { return document.querySelector(selector); };
 function esc(value) { return String(value == null ? "" : value).replace(/[&<>\"]/g, function(c) { return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
 function setAccent(major) { document.documentElement.style.setProperty("--accent", (ATTRIBUTE[major] || ATTRIBUTE.amiable).color); }
@@ -62,6 +78,7 @@ function journeyClass() {
   if (state.page === "result") return "journey-result";
   if (state.page === "library") return "journey-library";
   if (state.page === "threshold") return "journey-threshold";
+  if (state.page === "tiebreak") return "journey-tiebreak";
   if (state.page !== "question") return "journey-start";
   var step = state.stage === 1 ? state.index + 1 : 10 + state.index + 1;
   if (step <= 5) return "journey-deep";
@@ -75,8 +92,8 @@ function createKomorebi() {
   for (var j = 0; j < 30; j++) { var dot = document.createElement("span"); dot.className = "komorebi-dot"; var size = 2 + Math.random() * 5; dot.style.width = size + "px"; dot.style.height = size + "px"; dot.style.left = Math.random() * 100 + "%"; dot.style.top = Math.random() * 100 + "%"; dot.style.animationDuration = 5 + Math.random() * 8 + "s"; dot.style.animationDelay = Math.random() * 6 + "s"; layer.appendChild(dot); }
 }
 function transitionTo(page) { var leaf = $("#leafTransition"); if (!leaf) { state.page = page; render(); return; } leaf.classList.add("show"); window.setTimeout(function() { state.page = page; render(); leaf.classList.remove("show"); }, 240); }
-function startJourney() { state.stage = 1; state.index = 0; state.majorScores = {}; state.minorScores = {}; state.major = null; state.result = null; state.history = []; state.optionOrders = {}; transitionTo("question"); }
-function resetJourney() { state.stage = 1; state.index = 0; state.majorScores = {}; state.minorScores = {}; state.major = null; state.result = null; state.history = []; state.optionOrders = {}; transitionTo("title"); }
+function startJourney() { state.stage = 1; state.index = 0; state.majorScores = {}; state.minorScores = {}; state.major = null; state.result = null; state.history = []; state.optionOrders = {}; state.tieBreak = null; state.tieResolutions = {}; transitionTo("question"); }
+function resetJourney() { state.stage = 1; state.index = 0; state.majorScores = {}; state.minorScores = {}; state.major = null; state.result = null; state.history = []; state.optionOrders = {}; state.tieBreak = null; state.tieResolutions = {}; transitionTo("title"); }
 function currentQuestion() { return state.stage === 1 ? DATA.stage1[state.index] : DATA.stage2ByMajor[state.major][state.index]; }
 function shuffleOptions(options, key) {
   if (!state.optionOrders[key]) {
@@ -90,22 +107,36 @@ function shuffleOptions(options, key) {
   return state.optionOrders[key].map(function(index) { return options[index]; });
 }
 function winner(scores, order) { return order.reduce(function(best, key) { return !best || (scores[key] || 0) > (scores[best] || 0) ? key : best; }, null); }
-function snapshot() { return { stage: state.stage, index: state.index, majorScores: Object.assign({}, state.majorScores), minorScores: Object.assign({}, state.minorScores), major: state.major, result: state.result, optionOrders: JSON.parse(JSON.stringify(state.optionOrders)) }; }
+function topCandidates(scores, order) { var max = Math.max.apply(null, order.map(function(key) { return scores[key] || 0; })); return order.filter(function(key) { return (scores[key] || 0) === max; }); }
+function snapshot() { return { stage: state.stage, index: state.index, majorScores: Object.assign({}, state.majorScores), minorScores: Object.assign({}, state.minorScores), major: state.major, result: state.result, optionOrders: JSON.parse(JSON.stringify(state.optionOrders)), tieBreak: state.tieBreak ? JSON.parse(JSON.stringify(state.tieBreak)) : null, tieResolutions: Object.assign({}, state.tieResolutions) }; }
 function choose(key) {
   state.history.push(snapshot());
   if (state.stage === 1) {
     state.majorScores[key] = (state.majorScores[key] || 0) + 1;
     if (state.index < DATA.stage1.length - 1) { state.index += 1; render(); return; }
-    state.major = winner(state.majorScores, MAJORS); state.stage = 2; state.index = 0; setAccent(state.major); transitionTo("threshold"); return;
+    var majorCandidates = topCandidates(state.majorScores, MAJORS);
+    if (majorCandidates.length > 1) { state.tieBreak = { phase: "major", candidates: majorCandidates }; transitionTo("tiebreak"); return; }
+    state.major = majorCandidates[0]; state.stage = 2; state.index = 0; setAccent(state.major); transitionTo("threshold"); return;
   }
   state.minorScores[key] = (state.minorScores[key] || 0) + 1;
   var stage2 = DATA.stage2ByMajor[state.major];
   if (state.index < stage2.length - 1) { state.index += 1; render(); return; }
-  var minor = winner(state.minorScores, MINORS);
+  var minorCandidates = topCandidates(state.minorScores, MINORS);
+  if (minorCandidates.length > 1) { state.tieBreak = { phase: "minor", candidates: minorCandidates }; transitionTo("tiebreak"); return; }
+  var minor = minorCandidates[0];
   state.result = DATA.types.find(function(type) { return type.major === state.major && type.minor === minor; });
   transitionTo("result");
 }
-function goBack() { var prev = state.history.pop(); if (!prev) return; var fromThreshold = state.page === "threshold"; Object.assign(state, prev); if (fromThreshold) state.page = "question"; render(); }
+function resolveTie(key) {
+  if (!state.tieBreak || state.tieBreak.candidates.indexOf(key) < 0) return;
+  var phase = state.tieBreak.phase;
+  state.tieResolutions[phase] = { candidates: state.tieBreak.candidates.slice(), selected: key };
+  state.tieBreak = null;
+  if (phase === "major") { state.major = key; state.stage = 2; state.index = 0; setAccent(key); transitionTo("threshold"); return; }
+  state.result = DATA.types.find(function(type) { return type.major === state.major && type.minor === key; });
+  transitionTo("result");
+}
+function goBack() { var prev = state.history.pop(); if (!prev) return; var fromInterlude = state.page === "threshold" || state.page === "tiebreak"; Object.assign(state, prev); if (fromInterlude) state.page = "question"; render(); }
 function stripMarkdown(text) { return String(text || "").replace(/^#{2,3}\s*/gm, "").replace(/\*\*(.*?)\*\*/g, "$1").replace(/^>\s*/gm, "").replace(/^-\s*/gm, "・").trim(); }
 function resultSections(text) {
   var raw = String(text || "").replace(/^##\s*.+$/m, "").replace(/^\*\*（[^\n]*×[^\n]*｜[^\n]*）\*\*\s*$/gm, "").trim();
@@ -186,6 +217,16 @@ function questionView() {
   var optionKey = state.stage + '-' + (state.stage === 1 ? 'main' : state.major) + '-' + state.index; var options = shuffleOptions(q.options, optionKey).map(function(option) { return '<button class="choice-btn" data-answer="' + esc(option.key) + '">' + esc(option.label) + '</button>'; }).join("");
   return '<section class="page active page-question"><div class="q-container q-container-text"><div class="q-header"><div class="q-stage-label">' + stageLabel + '</div><div class="q-progress"><div class="q-progress-bar" style="width:' + progress + '%"></div></div></div><div class="question-card question-card-text"><div class="question-copy"><div class="room-label">' + room + '</div><p class="q-count">' + step + ' / 20</p><h2 class="q-text">' + esc(q.question) + '</h2><div class="choices">' + options + '</div><div class="q-actions"><button class="btn-subtle" data-action="back" ' + (state.history.length ? "" : "disabled") + '>ひとつ戻る</button><button class="btn-subtle" data-action="reset">最初に戻る</button></div></div></div></div></section>';
 }
+function tieBreakView() {
+  var tie = state.tieBreak;
+  var isMajor = tie && tie.phase === "major";
+  var question = isMajor ? MAJOR_TIEBREAKER : MINOR_TIEBREAKERS[state.major];
+  var intro = tie.candidates.length === 2 ? "ふたつの気配が、同じくらい近くにあります。" : "いくつかの気配が、同じくらい近くにあります。";
+  var options = tie.candidates.map(function(key) { return { key: key, label: question.options[key] }; });
+  var optionKey = "tiebreak-" + tie.phase + "-" + (state.major || "major") + "-" + tie.candidates.join("-");
+  var optionHtml = shuffleOptions(options, optionKey).map(function(option) { return '<button class="choice-btn tiebreak-choice" data-tiebreak-answer="' + esc(option.key) + '">' + esc(option.label) + '</button>'; }).join("");
+  return '<section class="page active page-tiebreak"><div class="tiebreak-container"><div class="tiebreak-eyebrow">BETWEEN THE PATHS</div><p class="tiebreak-whisper">' + esc(intro) + '</p><h2 class="tiebreak-title">もうひとつだけ、<br>今のあなたの心に聞いてみましょう。</h2><div class="tiebreak-card"><div class="room-label">追加の問い</div><h3>' + esc(question.question) + '</h3><div class="choices">' + optionHtml + '</div><div class="q-actions"><button class="btn-subtle" data-action="back">ひとつ戻る</button><button class="btn-subtle" data-action="reset">最初に戻る</button></div></div></div></section>';
+}
 function thresholdView() {
   return '<section class="page active page-threshold"><div class="threshold-wrap"><div class="threshold-eyebrow">BETWEEN THE PATHS</div><div class="guardian-presence" aria-hidden="true"><span class="guardian-glow"></span><span class="guardian-silhouette"><i></i></span><span class="guardian-trail guardian-trail-one"></span><span class="guardian-trail guardian-trail-two"></span><span class="guardian-trail guardian-trail-three"></span></div><p class="threshold-whisper">……かすかに、誰かの気配がする。</p><h2 class="threshold-title">あなたを見守ってきた子が、<br>この先で待っているようです。</h2><p class="threshold-copy">まだ姿はよく見えません。<br>もう少しだけ、こころの奥へ進んでみましょう。</p><div class="threshold-actions"><button class="btn-primary" data-action="continue-stage2">気配をたどる</button><button class="btn-subtle" data-action="back">ひとつ戻る</button></div></div></section>';
 }
@@ -216,8 +257,9 @@ const MINOR_INSIGHT = {
 function rankedScores(scores, order) {
   return order.map(function(key, index) { return { key: key, score: scores[key] || 0, order: index }; }).sort(function(a, b) { return b.score - a.score || a.order - b.order; });
 }
-function scoreRows(scores, order, labels, total) {
+function scoreRows(scores, order, labels, total, preferred) {
   var ranked = rankedScores(scores, order);
+  ranked.sort(function(a, b) { if (a.score !== b.score) return b.score - a.score; if (a.key === preferred) return -1; if (b.key === preferred) return 1; return a.order - b.order; });
   var top = Math.max(1, ranked[0].score);
   return ranked.map(function(item, index) {
     var rowClass = index === 0 ? "is-first" : (index === 1 ? "is-near" : "is-muted");
@@ -229,7 +271,10 @@ function resultReasonView(type) {
   var nearMinor = minorRanked.find(function(item) { return item.key !== type.minor; });
   var nearType = nearMinor && DATA.types.find(function(item) { return item.major === type.major && item.minor === nearMinor.key; });
   var nearCopy = nearType ? '<div class="result-near-guardian"><i aria-hidden="true"></i><span>「' + esc(MINOR_INSIGHT[nearMinor.key].short) + '」傾向も近く、<strong>' + esc(splitName(nearType.name).main) + '</strong>の気配もありました。</span></div>' : "";
-  return '<section class="result-reason" aria-labelledby="result-reason-title"><div class="result-reason-eyebrow">今回の守護者が現れた理由</div><h3 id="result-reason-title">あなたの中にある、ふたつの傾向</h3><p class="result-reason-lead">ひとつに決めつけるのではなく、今回よく現れた心の動きを示しています。</p><div class="result-reason-path"><section class="result-score-stage"><header><strong>大切にしていたもの</strong><span>前半10問</span></header>' + scoreRows(state.majorScores, MAJORS, MAJOR_INSIGHT, DATA.stage1.length) + '</section><div class="result-reason-symbol" aria-hidden="true">＋</div><section class="result-score-stage"><header><strong>よく使っていた守り方</strong><span>後半10問</span></header>' + scoreRows(state.minorScores, MINORS, MINOR_INSIGHT, DATA.stage2ByMajor[state.major].length) + '</section><div class="result-reason-symbol" aria-hidden="true">→</div><section class="result-reason-guardian"><span>今回、いちばん近くにいた守護者</span><strong>' + esc(splitName(type.name).main) + '</strong></section></div><div class="result-reason-copy"><strong>なぜ' + esc(splitName(type.name).main) + 'になったの？</strong><p>' + esc(MAJOR_INSIGHT[type.major].reason) + 'を大切にしながら、' + esc(MINOR_INSIGHT[type.minor].reason) + 'ことで守ろうとする回答が、今回はもっとも多く選ばれていました。</p>' + nearCopy + '</div><p class="result-reason-note">※ 点数はあなたの価値や強さではなく、今回選んだ回答の重なりです。</p></section>';
+  var resolved = state.tieResolutions.major || state.tieResolutions.minor;
+  var resolutionCopy = resolved ? '<p class="result-tie-resolution">同じくらい近い傾向があったため、最後の追加の問いへの回答から、今回の守護者を選びました。</p>' : "";
+  var reasonText = esc(MAJOR_INSIGHT[type.major].reason) + 'を大切にしながら、' + esc(MINOR_INSIGHT[type.minor].reason) + 'ことで守ろうとする傾向が、今回の回答に現れていました。';
+  return '<section class="result-reason" aria-labelledby="result-reason-title"><div class="result-reason-eyebrow">今回の守護者が現れた理由</div><h3 id="result-reason-title">あなたの中にある、ふたつの傾向</h3><p class="result-reason-lead">ひとつに決めつけるのではなく、今回よく現れた心の動きを示しています。</p><div class="result-reason-path"><section class="result-score-stage"><header><strong>大切にしていたもの</strong><span>前半10問</span></header>' + scoreRows(state.majorScores, MAJORS, MAJOR_INSIGHT, DATA.stage1.length, type.major) + '</section><div class="result-reason-symbol" aria-hidden="true">＋</div><section class="result-score-stage"><header><strong>よく使っていた守り方</strong><span>後半10問</span></header>' + scoreRows(state.minorScores, MINORS, MINOR_INSIGHT, DATA.stage2ByMajor[state.major].length, type.minor) + '</section><div class="result-reason-symbol" aria-hidden="true">→</div><section class="result-reason-guardian"><span>今回、いちばん近くにいた守護者</span><strong>' + esc(splitName(type.name).main) + '</strong></section></div><div class="result-reason-copy"><strong>なぜ' + esc(splitName(type.name).main) + 'になったの？</strong><p>' + reasonText + '</p>' + resolutionCopy + nearCopy + '</div><p class="result-reason-note">※ 点数はあなたの価値や強さではなく、今回選んだ回答の重なりです。</p></section>';
 }
 function resultView() {
   var type = state.result;
@@ -240,8 +285,8 @@ function resultView() {
 function libraryView() { var filters = [{key:"all", label:"すべて"}].concat(MAJORS.map(function(key){ return {key:key, label:ATTRIBUTE[key].jp}; })); var types = state.filter === "all" ? DATA.types : DATA.types.filter(function(type){ return type.major === state.filter; }); var filterHtml = filters.map(function(filter){ return '<button class="guardian-filter-btn ' + (state.filter === filter.key ? "is-active" : "") + '" data-filter="' + filter.key + '">' + filter.label + '</button>'; }).join(""); var cards = types.map(function(type){ var current = state.result && state.result.id === type.id; return '<article class="guardian-card ' + (current ? "is-current" : "") + '"><img src="' + esc(type.image) + '" alt="' + esc(type.name) + '"><div class="guardian-card-body"><div class="guardian-card-group">' + esc(type.majorLabel) + ' × ' + esc(type.minorLabel) + '</div><h3 class="guardian-card-name">' + esc(type.name) + '</h3><p class="guardian-card-catch">' + esc(type.oneLine) + '</p>' + (current ? '<div class="guardian-current-badge">あなたの守護者</div>' : '') + '</div></article>'; }).join(""); return '<section class="page active page-guardians"><div class="guardian-container"><div class="guardian-head"><div class="intro-eyebrow">Guardian Library</div><h2 class="guardian-title">16人の守護者図鑑</h2><p class="guardian-lead">あなたの結果だけでなく、森にいるほかの守護者たちも覗いてみましょう。</p></div><div class="guardian-filter-row">' + filterHtml + '</div><div class="guardian-grid">' + cards + '</div><div class="guardian-actions"><button class="btn-primary" data-action="restart">もう一度診断する</button>' + (state.result ? '<button class="btn-subtle" data-action="result">結果へ戻る</button>' : '<button class="btn-subtle" data-action="title">タイトルへ戻る</button>') + '</div></div></section>'; }
 function surveyInvitation() { return '<aside class="survey-invitation" aria-labelledby="survey-title"><div class="survey-eyebrow">あなたの声を聞かせてください</div><h3 id="survey-title">この診断はいかがでしたか？</h3><p>これからの体験をより良くするため、短いアンケートにご協力いただけるとうれしいです。</p><a class="btn-survey" href="https://forms.gle/TaA3ACcRrwcMb1DW8" target="_blank" rel="noopener noreferrer">アンケートに回答する<span>別のページで開きます</span></a></aside>'; }
 function lineInvitation() { return '<aside class="line-invitation" aria-labelledby="line-title"><div class="line-invitation-mark" aria-hidden="true">✉</div><div class="line-invitation-copy"><div class="line-eyebrow">診断の、その先へ</div><h3 id="line-title">あなたの守護者から、手紙が届きます</h3><p>守護者の想いを知り、自分のこころと向き合うためのワークをLINEで受け取れます。</p><a class="btn-line-journey" href="https://lin.ee/5EvIPKV" target="_blank" rel="noopener noreferrer"><strong>LINEで手紙を受け取る</strong><span>守護者の想いを知りにいく</span></a></div></aside>'; }
-function render() { setAccent(state.major || "amiable"); document.body.className = journeyClass(); var app = $("#app"); if (state.page === "title") app.innerHTML = titleView(); if (state.page === "intro") app.innerHTML = introView(); if (state.page === "threshold") app.innerHTML = thresholdView(); if (state.page === "question") app.innerHTML = questionView(); if (state.page === "result") { app.innerHTML = resultView(); var story = app.querySelector(".result-story"); if (story) story.insertAdjacentHTML("afterend", lineInvitation()); var discovery = app.querySelector(".result-discovery"); if (discovery) discovery.insertAdjacentHTML("afterend", surveyInvitation()); } if (state.page === "library") app.innerHTML = libraryView(); bindEvents(); }
-function bindEvents() { document.querySelectorAll("[data-action]").forEach(function(el){ el.addEventListener("click", function(){ var action = el.dataset.action; if (action === "intro") transitionTo("intro"); if (action === "start" || action === "restart") startJourney(); if (action === "continue-stage2") transitionTo("question"); if (action === "reset") resetJourney(); if (action === "back") goBack(); if (action === "library") transitionTo("library"); if (action === "result") transitionTo("result"); if (action === "title") transitionTo("title"); if (action === "copy") copyResult(); if (action === "line") shareLine(); if (action === "x") shareX(); if (action === "download") downloadImage(); }); }); document.querySelectorAll("[data-answer]").forEach(function(el){ el.addEventListener("click", function(){ var answer = el.dataset.answer; el.blur(); choose(answer); }); }); document.querySelectorAll("[data-filter]").forEach(function(el){ el.addEventListener("click", function(){ state.filter = el.dataset.filter; render(); }); }); }
+function render() { setAccent(state.major || "amiable"); document.body.className = journeyClass(); var app = $("#app"); if (state.page === "title") app.innerHTML = titleView(); if (state.page === "intro") app.innerHTML = introView(); if (state.page === "threshold") app.innerHTML = thresholdView(); if (state.page === "tiebreak") app.innerHTML = tieBreakView(); if (state.page === "question") app.innerHTML = questionView(); if (state.page === "result") { app.innerHTML = resultView(); var story = app.querySelector(".result-story"); if (story) story.insertAdjacentHTML("afterend", lineInvitation()); var discovery = app.querySelector(".result-discovery"); if (discovery) discovery.insertAdjacentHTML("afterend", surveyInvitation()); } if (state.page === "library") app.innerHTML = libraryView(); bindEvents(); }
+function bindEvents() { document.querySelectorAll("[data-action]").forEach(function(el){ el.addEventListener("click", function(){ var action = el.dataset.action; if (action === "intro") transitionTo("intro"); if (action === "start" || action === "restart") startJourney(); if (action === "continue-stage2") transitionTo("question"); if (action === "reset") resetJourney(); if (action === "back") goBack(); if (action === "library") transitionTo("library"); if (action === "result") transitionTo("result"); if (action === "title") transitionTo("title"); if (action === "copy") copyResult(); if (action === "line") shareLine(); if (action === "x") shareX(); if (action === "download") downloadImage(); }); }); document.querySelectorAll("[data-answer]").forEach(function(el){ el.addEventListener("click", function(){ var answer = el.dataset.answer; el.blur(); choose(answer); }); }); document.querySelectorAll("[data-tiebreak-answer]").forEach(function(el){ el.addEventListener("click", function(){ var answer = el.dataset.tiebreakAnswer; el.blur(); resolveTie(answer); }); }); document.querySelectorAll("[data-filter]").forEach(function(el){ el.addEventListener("click", function(){ state.filter = el.dataset.filter; render(); }); }); }
 lineInvitation = function() {
   var guardianName = state.result ? splitName(state.result.name).main : "";
   return '<aside class="line-invitation" aria-labelledby="line-title"><div class="line-invitation-mark" aria-hidden="true">&#9993;</div><div class="line-invitation-copy"><div class="line-eyebrow">\u8a3a\u65ad\u306e\u3001\u305d\u306e\u5148\u3078</div><h3 id="line-title">\u5b88\u8b77\u8005\u306e\u540d\u524d\u3092\u547c\u3093\u3067\u307f\u3066\u304f\u3060\u3055\u3044</h3><p>LINE\u3067 <strong class="line-guardian-name">\u300c' + esc(guardianName) + '\u300d</strong> \u3068\u9001\u308b\u3068\u3001\u5b88\u8b77\u8005\u304b\u3089\u3042\u306a\u305f\u5b9b\u3066\u306e\u624b\u7d19\u304c\u5c4a\u304d\u307e\u3059\u3002</p><a class="btn-line-journey" href="https://lin.ee/5EvIPKV" target="_blank" rel="noopener noreferrer"><strong>LINE\u3067\u5b88\u8b77\u8005\u306e\u540d\u524d\u3092\u9001\u308b</strong><span>\u53cb\u3060\u3061\u8ffd\u52a0\u5f8c\u3001\u540d\u524d\u3092\u9001\u3063\u3066\u304f\u3060\u3055\u3044</span></a></div></aside>';

@@ -626,6 +626,22 @@ body.journey-result .btn-discovery span {
 }
 
 /* A glimpse of the guardian between stage 1 and stage 2 */
+.page-tiebreak {
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(200, 168, 75, .14), transparent 30%),
+    linear-gradient(160deg, #101f12 0%, #182819 58%, #101a11 100%);
+}
+.tiebreak-container { width: min(100%, 680px); }
+.tiebreak-eyebrow { margin-bottom: .8rem; color: var(--sunbeam); font-size: .68rem; letter-spacing: .25em; opacity: .8; }
+.tiebreak-whisper { margin: 0 0 .65rem; color: var(--leaf-pale); font-size: .86rem; line-height: 1.8; }
+.tiebreak-title { margin: 0 0 1.5rem; color: var(--white-soft); font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: clamp(1.25rem, 4vw, 1.75rem); font-weight: 300; line-height: 1.8; }
+.tiebreak-card { padding: clamp(1.1rem, 4vw, 1.7rem); border: 1px solid rgba(200, 168, 75, .2); border-radius: 20px; background: rgba(15, 31, 15, .38); text-align: left; }
+.tiebreak-card h3 { margin: 0 0 1.4rem; color: var(--white-soft); font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: clamp(1rem, 2.5vw, 1.25rem); font-weight: 300; line-height: 1.9; }
+.tiebreak-choice { border-color: rgba(200, 168, 75, .35); background: rgba(45, 74, 45, .34); }
+.result-tie-resolution { padding-left: .8rem; border-left: 3px solid rgba(182, 144, 60, .55); color: #665a3d !important; }
+
+/* A glimpse of the guardian between stage 1 and stage 2 */
 .page-threshold {
   overflow: hidden;
   text-align: center;
