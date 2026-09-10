@@ -733,6 +733,43 @@ body.journey-result .btn-discovery span {
   .threshold-actions .btn-primary { width: min(100%, 320px); }
 }
 
+/* Character introductions in the guardian library */
+.guardian-card { position: relative; }
+.guardian-card-open { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; border: 0; border-radius: inherit; background: transparent; cursor: pointer; }
+.guardian-card-open:focus-visible { outline: 3px solid #6c762f; outline-offset: -3px; }
+.guardian-card:has(.guardian-card-open:hover) { border-color: #9a7b26; }
+.guardian-card-more { display: block; margin-top: 1rem; color: #6d5620; font-size: .85rem; font-weight: 600; }
+.guardian-dialog { width: min(760px, calc(100% - 24px)); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid #c9bb99; border-radius: 22px; background: var(--paper); color: var(--ink-soft); box-shadow: 0 24px 80px #0f1f0f55; overflow-y: auto; overscroll-behavior: contain; }
+.guardian-dialog::backdrop { background: rgba(15, 31, 15, .72); }
+.guardian-dialog-toolbar { position: sticky; top: 0; z-index: 2; display: flex; justify-content: flex-end; padding: 10px 16px; background: var(--paper); border-bottom: 1px solid var(--line); }
+.guardian-dialog-close { min-height: 44px; padding: 0 18px; border: 1px solid #b4a379; border-radius: 999px; background: transparent; color: #5d563f; cursor: pointer; }
+.guardian-dialog-close:hover { background: #f0e8d5; }
+.guardian-dialog-close:focus-visible { outline: 3px solid #6c762f; outline-offset: 2px; }
+.guardian-detail { padding: 24px; line-height: 1.9; overflow-wrap: anywhere; }
+.guardian-detail-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; align-items: center; margin-bottom: 24px; }
+.guardian-detail-header img { display: block; width: 100%; border-radius: 14px; }
+.guardian-detail h2 { margin: 0; font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 500; line-height: 1.5; }
+.guardian-detail p { margin: .5rem 0 0; }
+.guardian-detail .guardian-detail-group { margin: 0 0 .5rem; color: #6c6658; font-size: .78rem; }
+.guardian-detail-sub { color: #806324; }
+.guardian-detail-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.guardian-detail-sections section { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: #f7f3e9; }
+.guardian-detail h3 { margin: 0; color: #55613b; font-size: .95rem; }
+.guardian-detail-sections p, .guardian-detail dd { font-size: .9rem; }
+.guardian-detail-reaction { grid-column: 1 / -1; }
+.guardian-detail dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin-bottom: 0; }
+.guardian-detail dt { color: #6c6658; font-size: .8rem; }
+.guardian-detail dd { margin: 0; }
+.guardian-detail-keywords { padding-top: 16px; color: #6c6658; font-size: .82rem; }
+@media (max-width: 560px) {
+  .guardian-detail { padding: 18px; }
+  .guardian-detail-header, .guardian-detail-sections { grid-template-columns: minmax(0, 1fr); }
+  .guardian-detail-header { gap: 18px; }
+  .guardian-detail-header img { max-width: 240px; margin: auto; }
+  .guardian-detail dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .guardian-detail dd { margin-bottom: 10px; }
+}
+
 /* Guardian library entry on the title page */
 .title-actions {
   display: flex;
