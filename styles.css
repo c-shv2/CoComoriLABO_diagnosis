@@ -783,6 +783,29 @@ body.journey-result .btn-discovery span {
   .guardian-detail dd { margin-bottom: 10px; }
 }
 
+/* Explore nearby guardians without leaving the diagnosis result. */
+.nearby-guardians { margin: 2.4rem auto; padding: clamp(18px, 4vw, 30px); border: 1px solid #d5d9c8; border-radius: 22px; background: #f3f5ec; color: #403d2f; text-align: left; }
+.nearby-guardians h3 { margin: 0; font-family: "Yu Mincho", serif; font-size: clamp(1.15rem, 3vw, 1.45rem); font-weight: 600; line-height: 1.7; }
+.nearby-guardians-lead { margin: .75rem 0 1.25rem; font-size: .9rem; line-height: 1.9; }
+.nearby-guardians-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; }
+.nearby-guardian-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid #ddd8c8; border-radius: 16px; background: #fffdf8; }
+.nearby-guardian-card img { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; }
+.nearby-guardian-copy { display: flex; flex-direction: column; flex: 1; padding: 18px; }
+.nearby-guardian-copy h4 { margin: .4rem 0; color: #343d2b; font-family: "Yu Mincho", serif; font-size: 1.25rem; font-weight: 600; }
+.nearby-guardian-copy p { margin: 0 0 1rem; font-size: .88rem; line-height: 1.85; }
+.nearby-guardian-copy .nearby-guardian-hint { margin: 0; color: #596647; font-size: .74rem; font-weight: 500; }
+.nearby-guardian-open, .nearby-library-button { min-height: 44px; padding: .65rem 1rem; border: 1px solid #697a53; border-radius: 999px; background: #fffdf8; color: #405334; font-weight: 500; cursor: pointer; }
+.nearby-guardian-open { margin-top: auto; }
+.nearby-library-button { display: block; margin: 1.25rem auto 0; }
+.nearby-guardian-open:hover, .nearby-library-button:hover { background: #e7eddb; }
+.nearby-guardian-open:focus-visible, .nearby-library-button:focus-visible { outline: 3px solid #697a53; outline-offset: 3px; }
+.nearby-guardians-note { margin: 1rem 0 0; color: #646951; font-size: .75rem; line-height: 1.8; }
+@media (max-width: 560px) {
+  .nearby-guardians-grid { grid-template-columns: 1fr; }
+  .nearby-guardian-card img { max-width: 280px; align-self: center; }
+  .nearby-library-button { width: 100%; }
+}
+
 /* Guardian library entry on the title page */
 .title-actions {
   display: flex;
